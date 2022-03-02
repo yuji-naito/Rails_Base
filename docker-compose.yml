@@ -1,0 +1,28 @@
+version: '3.9'
+services:
+  db:
+    image: mysql:8.0.28
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql-data:/var/lib/mysql:delegated
+  app:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    depends_on:
+      - db
+    environment:
+      EDITOR: vim
+      TZ: Asia/Tokyo
+    ports:
+      - '3000:3000'
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/app
+volumes:
+  mysql-data:
+    driver: local
